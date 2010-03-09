@@ -1,0 +1,5 @@
+Run as:
+ dltest <library_to_check> ..
+
+dltest will try to dlopen() all libs it gets on command line and
+will print errors when something fails.
