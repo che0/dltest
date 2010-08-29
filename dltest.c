@@ -3,12 +3,46 @@
 #include <dlfcn.h>
 #include <unistd.h>
 
+void print_help()
+{
+	printf(
+		"dltest [-d] <library_to_check> ...\n"
+		"dltest -h\n"
+		"\n"
+		"dltest will try to dlopen() all libs it gets on command line and\n"
+		"will print errors when something fails. When run with -d, it also\n"
+		"deletes libraries which fail to open.\n"
+	);
+}
+
 int main(int argc, char ** argv)
 {
+	int delete_failed = 0;
+	
+	int opt;
+	while ((opt = getopt(argc, argv, "hd")) != -1)
+	{
+		switch (opt)
+		{
+			case 'h':
+				print_help();
+				exit(EXIT_SUCCESS);
+			break;
+			
+			case 'd':
+				delete_failed = 1;
+			break;
+			
+			default:
+				fprintf(stderr, "Usage: %s [-d] library.so ...\n", argv[0]);
+				exit(EXIT_FAILURE);
+			break;
+		}
+	}
+	
 	int i;
 	int final_ret = EXIT_SUCCESS;
-	
-	for (i = 1; i < argc; i++)
+	for (i = optind; i < argc; i++)
 	{
 		void * dl_handle;
 		if (argv[i][0] == '/')
@@ -31,6 +65,10 @@ int main(int argc, char ** argv)
 		
 		// dlopen has failed
 		fprintf(stderr, "%s\n", dlerror());
+		if (delete_failed)
+		{
+			unlink(argv[i]);
+		}
 		final_ret = EXIT_FAILURE;
 	}
 	
