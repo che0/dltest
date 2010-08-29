@@ -1,9 +1,14 @@
+/** @file
+ * @brief Test utility for linkability of dynamic libraries
+ */
+
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <unistd.h>
 
-void print_help()
+static void print_help()
 {
 	printf(
 		"dltest [-d] <library_to_check> ...\n"
